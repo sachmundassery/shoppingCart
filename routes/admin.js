@@ -44,7 +44,7 @@ router.get('/add_product',function(req,res){
 })
 router.post('/add_product', function(req,res){
   console.log(req.body) // tocheck whether values are coming or not to the req object
-
+  console.log(req.files.image)
 })
 
 module.exports = router;
