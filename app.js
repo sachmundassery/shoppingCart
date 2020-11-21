@@ -10,6 +10,7 @@ var hbs=require('express-handlebars') // to bring in hbs
 var app = express();
 var fileUpload=require('express-fileupload')
 var db=require('./config/connection')
+var session = require('express-session')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,6 +23,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload())
+app.use(session({secret:"key",cookie:{maxAge:60000}})) // cookie stores the details of the user logged in. so each time when the user tries to login, he autoatically gets logged, this happens only for some amount of time, after that he needs to login again
+
 db.connect(function(err){
   if(err)
     console.log("Databse Connection Error"+err);
