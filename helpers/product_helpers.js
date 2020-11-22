@@ -22,5 +22,28 @@ module.exports={ // this contains all functions  needed
                 resolve(response)
             })
         })
+    },
+    getProductDetails:function(proId){
+        return new Promise(function(resolve,response){
+            db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:objectId(proId)}).then(function(product){
+                resolve(product)
+            })
+        })
+    },
+    updateProduct : function(proId,proDetails){
+        return new Promise(function(resolve,response){
+            db.get().collection(collection.PRODUCT_COLLECTION).
+            updateOne({_id:objectId(proId)},{
+                $set:{ // includes, the rows to be update
+                    Name:proDetails.Name,
+                    Category:proDetails.Category,
+                    Description:proDetails.Description,
+                    Price:proDetails.Price,
+                    
+                }
+            }).then(function(response){
+                resolve()
+            })
+        })
     }
 } 

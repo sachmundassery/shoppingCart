@@ -27,7 +27,7 @@ router.post('/add_product', function(req,res){
     let image=req.files.image
     
     console.log(id)
-    image.mv('./public/product_images/'+ id+'.jpg', function(err,done){
+    image.mv('./public/product_images/'+ id+'.jpg', function(err){
       if(!err){
         res.render('admin/add_product')// if no error navigate to this page
       }
@@ -44,6 +44,22 @@ router.get('/delete_product/:id',function(req,res){
   console.log(proId);
   productHelpers.deleteProduct(proId).then(function(response){
     res.redirect('/admin/')
+  })
+})
+router.get('/edit_product/:id',async function(req,res){
+  let product=await productHelpers.getProductDetails(req.params.id)
+  console.log(product);
+  res.render('admin/edit_product',{product})
+})
+router.post('/edit_product/:id',function(req,res){
+  let id = req.params.id
+  productHelpers.updateProduct(req.params.id,req.body).then(function(){
+     res.redirect('/admin') 
+     if(req.files.image){
+        let image=req.files.image
+        image.mv('./public/product_images/'+ id+'.jpg')
+
+     }
   })
 })
 
