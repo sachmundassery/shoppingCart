@@ -5,6 +5,7 @@
                 <tr>
                     <th scope="col">Item</th>
                     <th scope="col">Title</th>
+                    <th scope="col">Price</th>
                     <th scope="col">Quantity</th>
                 </tr>
             </thead>
@@ -12,20 +13,60 @@
                 {{#each products}}
                 <tr>
 
-                    {{#each this.product}}
-                    <td><img style="width:70px;height:70px" src="/product_images/{{this._id}}.jpg" alt=""></td>
-                    <td>{{this.Name}}</td>
-                    {{/each}}
+                    
+                    <td><img style="width:70px;height:70px" src="/product_images/{{this.product._id}}.jpg" alt=""></td>
+                    <td>{{this.product.Name}}</td>
+                    <td>Rs.{{this.product.Price}}</td>
+                    
                     <td>
-                        <button class="cart_item_count mr-3">-</button>{{this.quantity}}<button class="cart_item_count ml-3">+</button>
+                        <button class="cart_item_count mr-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user}}',-1)">-</button>
+                        <span id="{{this.product._id}}">{{this.quantity}}</span>
+                        <button class="cart_item_count ml-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user}}',1)">+</button> <!--to get outside value you need ../  -->
                     </td>
-                    <td>
+                    <!--
+                        <td>
                         <a href="" class="btn btn-danger">Remove</a>
                     </td>
+
+                        -->
                 </tr>
                 {{/each}}
             </tbody>
 
         </table>
+        <hr>
+        <h3 class="float-right mr-5 mt-4">Total : Rs.<span id="total">{{totalValue}}</span></h3>
+        <a href="/place_order" class="float_right mr-5 mt-4 btn btn-success">Place Order</a>
     </div>
 </section>
+
+<script>
+    function changeQuantity(cartId,proId,userId,count){
+       let quantity=parseInt(document.getElementById(proId).innerHTML)
+      // let price=parseInt(document.getElementById('fetchPrice').innerHTML)
+       count=parseInt(count) 
+        $.ajax({
+            url:'/change_product_quantity',
+            data:{ // this is given to users.js/ router.post("/change_product_quantity")........req.body
+                user:userId,
+                cart:cartId,
+                product:proId,
+                count:count,
+                quantity:quantity,
+                
+            },
+            method:'post',
+            success:function(response){
+                if(response.removeProduct){
+                    alert("Product removed from cart")
+                    location.reload() // to refresh the page after removing the item from the cart
+                }
+                else{
+                    console.log(response)
+                    document.getElementById(proId).innerHTML=quantity+count
+                    document.getElementById('total').innerHTML=response.total
+                }
+            }
+        })
+    }
+</script>

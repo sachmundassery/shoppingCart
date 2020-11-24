@@ -70,16 +70,38 @@ router.get('/logout',function(req,res){
 
 router.get('/cart',verifyLogin,async function(req,res){ // now this looks for the verifylogin and checks whether the user is logged in or not
   let products=await userHelpers.getCartProducts(req.session.user._id)
-  console.log(products);
-
-  res.render('user/cart',{products,user:req.session.user})
+  let totalValue = await userHelpers.getTotalAmount(req.session.user._id)
+  
+  
+  res.render('user/cart',{products,user:req.session.user._id,totalValue})
 })
 
 router.get('/add_to_cart/:id',function(req,res){
-  console.log("api call");
+  
   userHelpers.addToCart(req.params.id,req.session.user._id).then(function(){
-  res.json({status:true})
+  res.json({status:true}) 
+  }) 
+})
+  
+router.post('/change_product_quantity/',function(req,res,next){
+  console.log(req.body)
+    userHelpers.changeProductQuantity(req.body).then(async function(response){
+    response.total=await userHelpers.getTotalAmount(req.body.user) // try userId
+    res.json(response)
   })
+})
+router.get('/place_order',verifyLogin,async function(req,res){
+  let total=await userHelpers.getTotalAmount(req.session.user._id)
+  res.render('user/place_order',{total,user:req.session.user})
+})
+
+router.post('/place_order',async function(req,res){
+  let products=await userHelpers.getCartProductList(req.body.userId)
+  let totalPrice= await userHelpers.getTotalAmount(req.body.userId)
+  userHelpers.placeOrder(req.body,products,totalPrice).then(function(response){
+    res.json({status:true})
+  })
+  console.log(req.body)
 })
 
  
